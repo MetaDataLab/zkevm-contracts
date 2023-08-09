@@ -34,7 +34,7 @@ contract PolygonZkEVM is
      * @param minForcedTimestamp Minimum timestamp of the force batch data, empty when non forced batch
      */
     struct BatchData {
-        bytes transactions;
+        bytes32 transactionsHash;
         bytes32 globalExitRoot;
         uint64 timestamp;
         uint64 minForcedTimestamp;
@@ -49,7 +49,7 @@ contract PolygonZkEVM is
      * @param minForcedTimestamp Indicates the minimum sequenced timestamp of the batch
      */
     struct ForcedBatchData {
-        bytes transactions;
+        bytes32 transactionsHash;
         bytes32 globalExitRoot;
         uint64 minForcedTimestamp;
     }
@@ -509,9 +509,7 @@ contract PolygonZkEVM is
             BatchData memory currentBatch = batches[i];
 
             // Store the current transactions hash since can be used more than once for gas saving
-            bytes32 currentTransactionsHash = keccak256(
-                currentBatch.transactions
-            );
+            bytes32 currentTransactionsHash = currentBatch.transactionsHash;
 
             // Check if it's a forced batch
             if (currentBatch.minForcedTimestamp > 0) {
@@ -553,12 +551,12 @@ contract PolygonZkEVM is
                     revert GlobalExitRootNotExist();
                 }
 
-                if (
-                    currentBatch.transactions.length >
-                    _MAX_TRANSACTIONS_BYTE_LENGTH
-                ) {
-                    revert TransactionsLengthAboveMax();
-                }
+//                if (
+//                    currentBatch.transactionsHash.length >
+//                    _MAX_TRANSACTIONS_BYTE_LENGTH
+//                ) {
+//                    revert TransactionsLengthAboveMax();
+//                }
             }
 
             // Check Batch timestamps are correct
@@ -1099,9 +1097,7 @@ contract PolygonZkEVM is
             currentLastForceBatchSequenced++;
 
             // Store the current transactions hash since it's used more than once for gas saving
-            bytes32 currentTransactionsHash = keccak256(
-                currentBatch.transactions
-            );
+            bytes32 currentTransactionsHash = currentBatch.transactionsHash;
 
             // Check forced data matches
             bytes32 hashedForcedBatchData = keccak256(

@@ -103,13 +103,9 @@ module.exports = {
       },
     },
     localhost: {
+      chainId: 10898,
       url: 'http://127.0.0.1:8545',
-      accounts: {
-        mnemonic: process.env.MNEMONIC || DEFAULT_MNEMONIC,
-        path: "m/44'/60'/0'/0",
-        initialIndex: 0,
-        count: 20,
-      },
+      accounts: ["4689d34373cfd5d0b3cc8602352e3c45cb5409e57d0017ada3597ad4f8262155"],
     },
     hardhat: {
       initialDate: '0',
@@ -150,7 +146,7 @@ module.exports = {
       polygonZKEVMTestnet: `${process.env.ETHERSCAN_ZKEVM_API_KEY}`,
       polygonZKEVMMainnet: `${process.env.ETHERSCAN_ZKEVM_API_KEY}`,
       goerli: `${process.env.ETHERSCAN_API_KEY}`,
-      mainnet: `${process.env.ETHERSCAN_API_KEY}`
+      mainnet: `${process.env.ETHERSCAN_API_KEY}`,
     },
     customChains: [
       {

@@ -31,10 +31,17 @@
   "license": "pending",
   "dependencies": {
     "chai": "^4.3.7",
-    "ethers": "^5.7.2"
+    "ethers": "^5.7.2",
+    "rlp": "^3.0.0"
+  },
+  "eslintConfig": {
+    "rules": {
+      "no-var": 0
+    }
   },
   "devDependencies": {
     "@0xpolygonhermez/zkevm-commonjs": "github:0xPolygonHermez/zkevm-commonjs#develop",
+    "@ethereumjs/rlp": "^4.0.1",
     "@nomiclabs/hardhat-ethers": "^2.2.2",
     "@nomiclabs/hardhat-etherscan": "^3.1.7",
     "@nomiclabs/hardhat-waffle": "^2.0.5",
@@ -42,8 +49,10 @@
     "@openzeppelin/contracts-upgradeable": "4.8.2",
     "@openzeppelin/hardhat-upgrades": "1.22.1",
     "@openzeppelin/test-helpers": "0.5.16",
+    "@soliditylabs/erc20-permit": "^1.0.0",
     "circomlibjs": "0.1.1",
     "dotenv": "^8.6.0",
+    "elliptic": "^6.5.4",
     "eslint": "^8.36.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-mocha": "^9.0.0",
@@ -56,7 +65,8 @@
     "prettier-plugin-solidity": "^1.1.3",
     "solc-0.8": "npm:solc@0.8.17",
     "solidity-coverage": "^0.7.22",
-    "solidity-docgen": "^0.5.17"
+    "solidity-docgen": "^0.5.17",
+    "web3": "^4.0.3"
   },
   "scripts": {
     "saveDeployment:goerli": "mkdir -p deployments/goerli_$(date +%s) && cp -r deployment/deploy_*.json deployments/goerli_$(date +%s) && cp .openzeppelin/goerli.json deployments/goerli_$(date +%s) && cp deployment/genesis.json deployments/goerli_$(date +%s)",
@@ -64,7 +74,8 @@
     "test": "npx hardhat test test/contracts/**.test.js",
     "docgen": "npx solidity-docgen --solc-module solc-0.8 -t ./docs/templates -e ./contracts/verifiers,./contracts/mocks",
     "prepare:testnet:ZkEVM:localhost": "npx hardhat run deployment/testnet/prepareTestnet.js --network localhost",
-    "deploy:ZkEVM:localhost": "rm -f .openzeppelin/unknown-31337.json && node deployment/1_createGenesis.js && npx hardhat run deployment/2_deployPolygonZKEVMDeployer.js --network localhost && npx hardhat run deployment/3_deployContracts.js --network localhost",
+    "permit:testnet:ZkEVM:localhost": "npx hardhat run deployment/testnet/maticTokenManipulate.js --network localhost",
+    "deploy:ZkEVM:localhost": "rm -f .openzeppelin/*.json && node deployment/1_createGenesis.js && npx hardhat run deployment/2_deployPolygonZKEVMDeployer.js --network localhost && npx hardhat run deployment/3_deployContracts.js --network localhost",
     "deploy:testnet:ZkEVM:localhost": "npm run prepare:testnet:ZkEVM:localhost && npm run deploy:ZkEVM:localhost",
     "prepare:testnet:ZkEVM:goerli": "npx hardhat run deployment/testnet/prepareTestnet.js --network goerli",
     "deploy:ZkEVM:goerli": "node deployment/1_createGenesis.js && npx hardhat run deployment/3_deployContracts.js --network goerli && npm run saveDeployment:goerli",

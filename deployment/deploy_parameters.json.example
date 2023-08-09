@@ -1,7 +1,7 @@
 {
     "realVerifier": false,
     "trustedSequencerURL": "http://zkevm-json-rpc:8123",
-    "networkName": "zkevm",
+    "networkName": "zkEVM",
     "version":"0.0.1",
     "trustedSequencer":"0x617b3a3528F9cDd6630fd3301B9c8911F7Bf063D",
     "chainID": 1001,
@@ -9,15 +9,15 @@
     "trustedAggregatorTimeout": 604799,
     "pendingStateTimeout": 604799,
     "forkID": 1,
-    "admin":"0x617b3a3528F9cDd6630fd3301B9c8911F7Bf063D",
-    "zkEVMOwner": "0x617b3a3528F9cDd6630fd3301B9c8911F7Bf063D",
-    "timelockAddress": "0x617b3a3528F9cDd6630fd3301B9c8911F7Bf063D",
+    "admin":"0x617b3a3528F9cDd6630fd3301B9c8911F7Bf063D", //zkEVM proxy合约的admin账户
+    "zkEVMOwner": "0x617b3a3528F9cDd6630fd3301B9c8911F7Bf063D", //zkEVM proxy合约的owner账户，默认是部署地址，如果此地址设置不同于部署地址，则会把ownership转给此账户
+    "timelockAddress": "0x617b3a3528F9cDd6630fd3301B9c8911F7Bf063D", //l2的timelock合约地址
     "minDelayTimelock": 3600,
     "salt": "0x0000000000000000000000000000000000000000000000000000000000000000",
-    "initialZkEVMDeployerOwner" :"0xaddress",
-    "maticTokenAddress":"0x617b3a3528F9cDd6630fd3301B9c8911F7Bf063D",
-    "zkEVMDeployerAddress":"",
-    "deployerPvtKey": "",
+    "initialZkEVMDeployerOwner" :"0xaddress", //zkEVMDeployer合约的初始化owner地址
+    "maticTokenAddress":"0x617b3a3528F9cDd6630fd3301B9c8911F7Bf063D", //l1的matic token地址
+    "zkEVMDeployerAddress":"", //zkEVMDeployer合约的地址
+    "deployerPvtKey": "", //1、部署zkEVMDeployer合约的私钥;（注意脚本1的zkEVMDeployer是keyless account部署的） 2、在脚本3中部署zkEVM和GlobalExitRoot合约的私钥
     "maxFeePerGas":"",
     "maxPriorityFeePerGas":"",
     "multiplierGas": ""
