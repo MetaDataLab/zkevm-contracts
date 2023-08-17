@@ -17,7 +17,7 @@
     "initialZkEVMDeployerOwner" :"0xaddress", //zkEVMDeployer合约的初始化owner地址
     "maticTokenAddress":"0x617b3a3528F9cDd6630fd3301B9c8911F7Bf063D", //l1的matic token地址
     "zkEVMDeployerAddress":"", //zkEVMDeployer合约的地址
-    "deployerPvtKey": "", //1、部署zkEVMDeployer合约的私钥;（注意脚本1的zkEVMDeployer是keyless account部署的） 2、在脚本3中部署zkEVM和GlobalExitRoot合约的私钥
+    "deployerPvtKey": "0x4689d34373cfd5d0b3cc8602352e3c45cb5409e57d0017ada3597ad4f8262155", //1、部署zkEVMDeployer合约的私钥;（注意脚本1的zkEVMDeployer是keyless account部署的） 2、在脚本3中部署zkEVM和GlobalExitRoot合约的私钥
     "maxFeePerGas":"",
     "maxPriorityFeePerGas":"",
     "multiplierGas": ""
