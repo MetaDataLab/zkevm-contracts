@@ -68,21 +68,27 @@ contract PolygonZkEVMBridge is
     // PolygonZkEVM address
     address public polygonZkEVMaddress;
 
+    // Customize UserGasToken, suggest to use maticToken
+    address public userGasTokenAddressOnMainnet;
+
     /**
      * @param _networkID networkID
      * @param _globalExitRootManager global exit root manager address
      * @param _polygonZkEVMaddress polygonZkEVM address
+     * @param _userGasTokenAddress customized useGasToken address powered by Pinex
      * @notice The value of `_polygonZkEVMaddress` on the L2 deployment of the contract will be address(0), so
      * emergency state is not possible for the L2 deployment of the bridge, intentionally
      */
     function initialize(
         uint32 _networkID,
         IBasePolygonZkEVMGlobalExitRoot _globalExitRootManager,
-        address _polygonZkEVMaddress
+        address _polygonZkEVMaddress,
+        address _userGasTokenAddress
     ) external virtual initializer {
         networkID = _networkID;
         globalExitRootManager = _globalExitRootManager;
         polygonZkEVMaddress = _polygonZkEVMaddress;
+        userGasTokenAddressOnMainnet = _userGasTokenAddress;
 
         // Initialize OZ contracts
         __ReentrancyGuard_init();
@@ -158,8 +164,12 @@ contract PolygonZkEVMBridge is
         uint32 originNetwork;
         bytes memory metadata;
         uint256 leafAmount = amount;
-
         if (token == address(0)) {
+            // if customized userGasToken enabled, eth should not be treated as userGasToken
+            if (networkID == _MAINNET_NETWORK_ID && userGasTokenAddressOnMainnet != address(0)) {
+                revert DuplicateGasToken();
+            }
+
             // Ether transfer
             if (msg.value != amount) {
                 revert AmountDoesNotMatchMsgValue();
@@ -167,6 +177,51 @@ contract PolygonZkEVMBridge is
 
             // Ether is treated as ether from mainnet
             originNetwork = _MAINNET_NETWORK_ID;
+        } else if (token == userGasTokenAddressOnMainnet) { // customized userGasToken feature powered by Pinex
+            if(networkID == _MAINNET_NETWORK_ID) { // Mainnet to rollup
+                // Check msg.value is 0 if tokens are bridged
+                if (msg.value != 0) {
+                    revert MsgValueNotZero();
+                }
+                // Use permit if any
+                // if (permitData.length != 0) {
+                //  _permit(token, amount, permitData);
+                // }
+
+                // In order to support fee tokens check the amount received, not the transferred
+                uint256 balanceBefore = IERC20Upgradeable(token).balanceOf(
+                    address(this)
+                );
+                IERC20Upgradeable(token).safeTransferFrom(
+                    msg.sender,
+                    address(this),
+                    amount
+                );
+                uint256 balanceAfter = IERC20Upgradeable(token).balanceOf(
+                    address(this)
+                );
+
+                // Override leafAmount with the received amount
+                leafAmount = balanceAfter - balanceBefore;
+
+                originTokenAddress = token;
+                // Customized Erc20 is treated as ether from mainnet
+                originNetwork = _MAINNET_NETWORK_ID;
+
+                // Encode metadata
+                metadata = abi.encode(
+                    _safeName(token),
+                    _safeSymbol(token),
+                    _safeDecimals(token)
+                );
+            } else { // rollup to Mainnet
+                // layer2 balance transfer
+                if (msg.value != amount) {
+                    revert AmountDoesNotMatchMsgValue();
+                }
+                originTokenAddress = token;
+                originNetwork = _MAINNET_NETWORK_ID;
+            }
         } else {
             // Check msg.value is 0 if tokens are bridged
             if (msg.value != 0) {
@@ -336,7 +391,7 @@ contract PolygonZkEVMBridge is
         );
 
         // Transfer funds
-        if (originTokenAddress == address(0)) {
+        if (originTokenAddress == address(0) || (originTokenAddress == userGasTokenAddressOnMainnet && networkID != _MAINNET_NETWORK_ID)) { // eth as gasToken || customized gasToken
             // Transfer ether
             /* solhint-disable avoid-low-level-calls */
             (bool success, ) = destinationAddress.call{value: amount}(
